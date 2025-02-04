@@ -4,19 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Three.js + Vite</title>
+  <link href="./src/style.css" rel="stylesheet">
 </head>
 <body>
-<div id="canvas-container" style="width: 100%; height: 100%; position: relative;">
-  <canvas id="three-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+<div id="GameBoardComponent"></div>
+
+<div id="controls">
+  <button onclick="window.saveState()">Save</button>
+  <button onclick="window.loadState()">Load</button>
+  <button onclick="window.movePlayer(1,this)">Move Red</button>
 </div>
 
 <script type="module">
   import './src/Main.js';
 
-  const canvas = document.getElementById('three-canvas');
-  if (window.init) {
-    window.init(canvas);
-  }
+  window.addEventListener("DOMContentLoaded", () => {
+    window.init();
+  });
 </script>
 </body>
 </html>

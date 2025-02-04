@@ -27,8 +27,8 @@ export class GtlfLoader {
                     console.log(`Loaded model for ${player.name}`);
                     const model = gltf.scene;
 
-                    let x = -9.5;
-                    let y = 0.1;
+                    let x = 9.5;
+                    let y = 0.2;
                     let z = 9.5;
                     let offset = 0.5;
                     switch (player.name) {
