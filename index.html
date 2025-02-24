@@ -12,11 +12,14 @@
 <div id="controls">
   <button onclick="window.saveState()">Save</button>
   <button onclick="window.loadState()">Load</button>
-  <button onclick="window.movePlayer(1,this)">Move Red</button>
+  <button onclick="window.movePlayer(this,'red')">Move Red</button>
+  <button onclick="window.movePlayer(this,'green')">Move Green</button>
+  <button onclick="window.movePlayer(this,'blue')">Move Blue</button>
+  <button onclick="window.movePlayer(this,'yellow')">Move Yellow</button>
 </div>
 
 <script type="module">
-  import './src/Main.js';
+  import './src/MainTemp.js';
 
   window.addEventListener("DOMContentLoaded", () => {
     window.init();
