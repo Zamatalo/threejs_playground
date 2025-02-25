@@ -3,8 +3,9 @@ import * as THREE from "three";
 import {GameObject} from "./GameObject.js";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {PlayerColor} from "./globalVars.js";
 
-class MainTemp {
+class Main {
     constructor() {
         this.container = document.getElementById("GameBoardComponent");
         this.scene = this.initScene();
@@ -13,32 +14,37 @@ class MainTemp {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.loader = new GLTFLoader();
         this.handleResize();
-        this.initGame().then(r => console.log("Game started!"));
         this.animate();
     }
 
-    async initGame() {
+    createNewGame() {
         this.players = [
-            new PlayerObject(1, "red"),
-            new PlayerObject(2, "green"),
-            new PlayerObject(3, "blue"),
-            new PlayerObject(4, "yellow")
+            new PlayerObject(1, PlayerColor.PLAYER_RED),
+            new PlayerObject(2, PlayerColor.PLAYER_GREEN),
+            new PlayerObject(3, PlayerColor.PLAYER_BLUE),
+            new PlayerObject(4, PlayerColor.PLAYER_YELLOW),
         ];
-
-
-        await Promise.all(
-            this.players.map(player => player.loadPlayer(this.loader)));
-        this.players.forEach(player => this.scene.add(player.model));
-
         this.game = new GameObject(1, "STARTED", this.players, 0);
-
-        await Promise.all([
-            this.game.loadBoard(this.loader)
-        ]);
-        this.scene.add(this.game.model);
-        this.game.addHelpers(this.scene);
     }
 
+    async initGame() {
+        if (!this.game) {
+            console.warn("Game not found. Creating a new one...");
+            this.createNewGame();
+        }
+
+        await Promise.all(
+            this.game.players.map(player => {
+                player.loadPlayerModel(this.loader, this.scene)
+            })
+        );
+
+        await Promise.all([
+            this.game.loadBoardModel(this.loader, this.scene),
+
+        ]);
+        this.game.addHelpers(this.scene);
+    }
 
     initScene() {
         const scene = new THREE.Scene();
@@ -96,41 +102,50 @@ class MainTemp {
     }
 
     saveState() {
-        const state = this.players.map(player => ({
-            id: player.playerId,
-            name: player.name,
-            inJail: player.inJail,
-            pos: player.position,
-            //coords: { x: player.model.position.x, y: player.model.position.y, z: player.model.position.z },
-            properties: player.ownedProperties
-        }));
-
-
-        console.log(`Saved state: ${JSON.stringify(state)} `);
-        return state;
+        console.log(JSON.stringify(this.game));
+        return this.game;
     }
 
     loadState(state) {
-        state.forEach(savedPlayer => {
-            const player = this.players.find(p => p.id === savedPlayer.id);
-            if (player && player.model && savedPlayer.coords) {
-                player.model.position.set(
-                    savedPlayer.coords.x,
-                    savedPlayer.coords.y,
-                    savedPlayer.coords.z
-                );
-                player.pos = savedPlayer.pos;
-            }
-        });
+        console.log(JSON.stringify(this.game));
+        const parsedGame = JSON.parse(state);
+        this.game = new GameObject(
+            parsedGame.gameId,
+            parsedGame.status,
+            parsedGame.players.map(playerData =>
+                new PlayerObject(
+                    playerData.playerId,
+                    PlayerColor[playerData.name],
+                    playerData.balance,
+                    playerData.position,
+                    playerData.inJail,
+                    playerData.ownedProperties,
+                    null
+                )
+            ),
+        );
+
+
     }
+
 
 
 }
 
 window.init = function () {
-    const main = new MainTemp();
-    window.movePlayer = (button, name) =>
-        main.game.players.find(player => player.name === name).movePlayer(button);
+    const main = new Main();
+    window.movePlayer = (button, color) =>
+        main.game.players.find(player => player.color === PlayerColor[color]).movePlayer(button);
     window.saveState = () => main.saveState();
-    window.loadState = (state) => main.loadState(state);
+    window.loadState = (state) => {
+        main.scene = main.initScene(); //clear scene
+        main.loadState(state);
+        main.initGame().then(r => console.log("Game loaded"));
+    }
+    window.createNewGame = () => {
+        main.scene = main.initScene();
+        main.createNewGame();
+        main.initGame().then(r => "");
+    }
+
 };

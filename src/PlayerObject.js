@@ -1,11 +1,11 @@
 import gsap from "gsap";
 import {randInt} from "three/src/math/MathUtils.js";
-import {positions} from "./globalVars.js";
+import {PlayerColor, positions} from "./globalVars.js";
 
 export class PlayerObject {
-    constructor(playerId, name, balance, position, inJail, ownedProperties, model) {
+    constructor(playerId, color, balance, position, inJail, ownedProperties, model) {
         this.playerId = playerId;
-        this.name = name;
+        this.color = color;
         this.balance = balance;
         this.position = position;
         this.inJail = inJail;
@@ -14,21 +14,26 @@ export class PlayerObject {
         this.isAnimating = false;
     }
 
-    loadPlayer(loader) {
+    loadPlayerModel(loader, scene) {
         return new Promise((resolve, reject) => {
             loader.load(
-                `/models/my_monopoly/${this.name}_pawn.glb`,
+                `/models/my_monopoly/${this.color}_pawn.glb`,
                 (gltf) => {
                     this.model = gltf.scene;
-                    console.log(`Loaded model for ${this.name} player`);
-                    const {xOffset, zOffset} = this.helperSwitch(this.name);
-                    this.model.position.set(9.5 + xOffset, 0.1, 9.5 + zOffset);
-                    this.position = 0;
+                    console.log(`Loaded model for ${this.color} player`);
+                    const {xOffset, zOffset} = this.helperSwitch(this.color);
+
+                    if (this.position === null) {
+                        this.position = 0;
+                    }
+                    const coords = positions[this.position];
+                    this.model.position.set(coords.x + xOffset, 0.1, coords.z + zOffset);
                     this.model.scale.set(0.75, 0.75, 0.75);
+                    scene.add(this.model);
                     resolve();
                 },
                 undefined,
-                (error) => reject(`Error loading model for ${this.name}: ${error}`)
+                (error) => reject(`Error loading model for ${this.color}: ${error}`)
             );
         });
     }
@@ -42,10 +47,9 @@ export class PlayerObject {
         button.style.backgroundColor = "red";
 
         this.randomInt = randInt(1, 5);
-        console.log(`Player ${this.name} rolled ${this.randomInt}`);
+        console.log(`Player ${this.color} rolled ${this.randomInt}`);
 
         this.animatePlayerMovement(() => {
-            // this.position = (this.position + this.randomInt) % 40;
             this.isAnimating = false;
             button.disabled = false;
             button.style.backgroundColor = "";
@@ -77,7 +81,7 @@ export class PlayerObject {
                     return;
                 }
 
-                const {xOffset, zOffset} = this.helperSwitch(this.name);
+                const {xOffset, zOffset} = this.helperSwitch(this.color);
 
                 gsap.to(this.model.position, {
                     x: nextPosition.x + xOffset,
@@ -112,16 +116,22 @@ export class PlayerObject {
     helperSwitch(name) {
         const offset = 0.5;
         switch (name) {
-            case "red":
+            case PlayerColor.PLAYER_RED:
                 return {xOffset: offset, zOffset: offset};
-            case "green":
+            case PlayerColor.PLAYER_GREEN:
                 return {xOffset: -offset, zOffset: offset};
-            case "blue":
+            case PlayerColor.PLAYER_BLUE:
                 return {xOffset: offset, zOffset: -offset};
-            case "yellow":
+            case PlayerColor.PLAYER_YELLOW:
                 return {xOffset: -offset, zOffset: -offset};
             default:
                 return {xOffset: 0, zOffset: 0};
         }
     }
+
+    toJSON() {
+        const {model, isAnimating, ...rest} = this;
+        return rest;
+    }
+
 }

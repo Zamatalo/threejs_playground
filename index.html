@@ -11,11 +11,12 @@
 
 <div id="controls">
   <button onclick="window.saveState()">Save</button>
-  <button onclick="window.loadState()">Load</button>
-  <button onclick="window.movePlayer(this,'red')">Move Red</button>
-  <button onclick="window.movePlayer(this,'green')">Move Green</button>
-  <button onclick="window.movePlayer(this,'blue')">Move Blue</button>
-  <button onclick="window.movePlayer(this,'yellow')">Move Yellow</button>
+  <button id="loadGame">Load</button>
+  <button onclick="window.movePlayer(this,'PLAYER_RED')">Move Red</button>
+  <button onclick="window.movePlayer(this,'PLAYER_GREEN')">Move Green</button>
+  <button onclick="window.movePlayer(this,'PLAYER_BLUE')">Move Blue</button>
+  <button onclick="window.movePlayer(this,'PLAYER_YELLOW')">Move Yellow</button>
+  <button onclick="window.createNewGame()">Create new game</button>
 </div>
 
 <script type="module">
@@ -23,6 +24,50 @@
 
   window.addEventListener("DOMContentLoaded", () => {
     window.init();
+  });
+
+  const savedGameState = {
+    "gameId": "550e8400-e29b-41d4-a716-446655440000",
+    "gameState": "IN_PROGRESS",
+    "players": [
+      {
+        "playerId": "123e4567-e89b-12d3-a456-426614174000",
+        "name": "PLAYER_RED",
+        "balance": 1500,
+        "position": 1,
+        "inJail": false,
+        "ownedProperties": []
+      },
+      {
+        "playerId": "123e4567-e89b-12d3-a456-426614174001",
+        "name": "PLAYER_GREEN",
+        "balance": 1500,
+        "position": 1,
+        "inJail": false,
+        "ownedProperties": []
+      },
+      {
+        "playerId": "123e4567-e89b-12d3-a456-426614174002",
+        "name": "PLAYER_YELLOW",
+        "balance": 1500,
+        "position": 1,
+        "inJail": false,
+        "ownedProperties": []
+      },
+      {
+        "playerId": "123e4567-e89b-12d3-a456-426614174003",
+        "name": "PLAYER_BLUE",
+        "balance": 1500,
+        "position": 1,
+        "inJail": false,
+        "ownedProperties": []
+      }
+    ],
+    "currentPlayerIndex": 0
+  };
+
+  document.getElementById("loadGame").addEventListener("click", () => {
+    window.loadState(JSON.stringify(savedGameState));
   });
 </script>
 </body>

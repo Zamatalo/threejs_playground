@@ -10,3 +10,10 @@ export const positions = [
     {x: 9.5, z: -5.25}, {x: 9.5, z: -3.65}, {x: 9.5, z: -1.85}, {x: 9.5, z: 0.0},
     {x: 9.5, z: 1.85}, {x: 9.5, z: 3.65}, {x: 9.5, z: 5.25}, {x: 9.5, z: 7}
 ];
+
+export const PlayerColor = {
+    PLAYER_RED: "red",
+    PLAYER_GREEN: "green",
+    PLAYER_BLUE: "blue",
+    PLAYER_YELLOW: "yellow"
+};

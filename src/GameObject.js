@@ -10,7 +10,7 @@ export class GameObject {
         this.model = model;
     }
 
-    loadBoard(loader) {
+    loadBoardModel(loader, scene) {
         return new Promise((resolve, reject) => {
             const boardPath = `/models/my_monopoly/monopolyBoard.glb`;
             loader.load(
@@ -25,10 +25,10 @@ export class GameObject {
                             child.receiveShadow = true;
                         }
                     });
+                    scene.add(this.model);
                     resolve(this);
                 },
                 undefined,
-
                 (error) => reject(`Error loading model : ${error}`)
             );
         })
@@ -43,4 +43,10 @@ export class GameObject {
             scene.add(helper);
         });
     };
+
+    toJSON() {
+        const {model, ...rest} = this;
+        return rest;
+    }
+
 }
